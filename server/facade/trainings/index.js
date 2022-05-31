@@ -32,33 +32,98 @@
 //   };
 // }
 
+// // -----------------------------------------------------------------
+// // https://www.sergevandenoever.nl/Processing-multipart-form-data-in-nodejs-azure-function-with-httptrigger/
+// // -----------------------------------------------------------------
+// const MemoryStream = require("memorystream");
+// const multer = require("multer");
+// const upload = multer({ storage: multer.memoryStorage() });
+// const merge = require("deepmerge");
+
+// module.exports = async function (context, req) {
+//   var stream = new MemoryStream(req.body);
+//   for (let key in req) {
+//     if (req.hasOwnProperty(key)) {
+//       stream[key] = req[key];
+//     }
+//   }
+
+//   upload.any()(stream, null, (err) => {
+//     const f = stream.files[0];
+//     context.bindings.res = {
+//       status: 200,
+//       body: "OK"
+//     };
+//   });
+
+// };
+
 // -----------------------------------------------------------------
 // https://www.sergevandenoever.nl/Processing-multipart-form-data-in-nodejs-azure-function-with-httptrigger/
 // -----------------------------------------------------------------
-const bosboy = require("busboy");
-const MemoryStream = require("memorystream");
+const busboy = require("busboy");
 const fs = require("fs");
 const path = require("path");
 
-module.exports = async function (context, req) {
-  const bb = bosboy({ headers: req.headers });
-  const stream = new MemoryStream(req.body);
+var readOut = async function (context, req) {
+  return new Promise((resolve, reject) => {
+    var form = {};
+    var bb = busboy({ headers: req.headers });
 
-  bb.on("file", (name, buffer, info) => {
-    console.log(`file: ${name}`);
-    buffer.pipe(fs.createWriteStream(path.join("C:\\work", info.filename)));
+    bb.on("file", (name, file, info) => {
+      console.log(`file: ${name}`);
+      var bytes = [];
+      file.on("data", (chunk) => {
+        bytes.push(chunk);
+      });
+      file.on("end", () => {
+        form[name] = {
+          buffer: Buffer.concat(bytes),
+          ...info
+        };
+      });
+      file.resume();
+      // ------------
+      // form[name] = {
+      //   stream: file,
+      //   ...info
+      // };
+      // ------------
+      // var writer = fs.createWriteStream(path.join("C:\\work", info.filename));
+      // writer.on("close", () => {
+      //   file.resume();
+      // });
+      // file.pipe(writer);
+    });
+    bb.on("field", (name, value, info) => {
+      console.log(`name: ${name}  --> value: ${value}`);
+      form[name] = value;
+    });
+    bb.on("error", (err) => {
+      reject(err);
+    });
+    bb.on("finish", () => {
+      resolve(form);
+    });
+
+    bb.end(req.body);
   });
-  bb.on("field", (name, value, info) => {
-    console.log(`name: ${name}  --> value: ${value}`);
-  });
-  bb.on("close", () => {
-    context.res = {
+};
+
+module.exports = async function (context, req) {
+  var form;
+  try {
+    form = await readOut(context, req);
+    context.bindings.res = {
       status: 200,
       body: "OK"
     };
-  });
-
-  stream.pipe(bb);
+  } catch (err) {
+    context.bindings.res = {
+      status: 500,
+      body: "ERROR"
+    };
+  }
 };
 
 
