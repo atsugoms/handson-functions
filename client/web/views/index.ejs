@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css">
+  <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.14.0/css/all.css">
+  <link rel="stylesheet" href="/public/stylesheets/common.css">
+  <title>Document</title>
+</head>
+<body>
+  <div class="container">
+    <form action="http://localhost:7071/api/trainings" method="POST" enctype='multipart/form-data'>
+    <!-- <form action="/" method="POST" enctype='multipart/form-data'> -->
+      <div class="form-group">
+        <label for="file1">ファイル</label>
+        <input type="file" class="form-control-file" id="file1" name="file1">
+      </div>
+      <button type="submit" class="btn btn-primary">送信</button>
+    </form>
+  </div>
+</body>
+</html>
