@@ -12,12 +12,12 @@
     {
       "type": "http",
       "direction": "out",
-      "name": "res"
+      "name": "$return"
     },
     {
       "type": "queue",
       "direction": "out",
-      "name": "waiting",
+      "name": "outWaitingQueue",
       "queueName": "waiting",
       "connection": "QUEUE_STORAGE_ACCOUNT"
     },
@@ -25,7 +25,7 @@
       "type": "blob",
       "direction": "out",
       "name": "outImageBlob",
-      "path": "images/{filename}",
+      "path": "images/{guid}",
       "connection": "QUEUE_STORAGE_ACCOUNT"
     }
   ]

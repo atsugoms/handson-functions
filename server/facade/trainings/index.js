@@ -65,13 +65,12 @@ const busboy = require("busboy");
 const fs = require("fs");
 const path = require("path");
 
-var readOut = async function (context, req) {
+var readFormData = async function (context, req) {
   return new Promise((resolve, reject) => {
     var form = {};
     var bb = busboy({ headers: req.headers });
 
     bb.on("file", (name, file, info) => {
-      console.log(`file: ${name}`);
       var bytes = [];
       file.on("data", (chunk) => {
         bytes.push(chunk);
@@ -83,20 +82,8 @@ var readOut = async function (context, req) {
         };
       });
       file.resume();
-      // ------------
-      // form[name] = {
-      //   stream: file,
-      //   ...info
-      // };
-      // ------------
-      // var writer = fs.createWriteStream(path.join("C:\\work", info.filename));
-      // writer.on("close", () => {
-      //   file.resume();
-      // });
-      // file.pipe(writer);
     });
     bb.on("field", (name, value, info) => {
-      console.log(`name: ${name}  --> value: ${value}`);
       form[name] = value;
     });
     bb.on("error", (err) => {
@@ -113,16 +100,26 @@ var readOut = async function (context, req) {
 module.exports = async function (context, req) {
   var form;
   try {
-    form = await readOut(context, req);
+    // マルチパートフォームの読み取り
+    form = await readFormData(context, req);
+
+    // Blob へ書き込み
     context.bindings.outImageBlob = form["file1"].buffer;
-    context.bindings.res = {
+
+    // Queue へ書き込み
+    context.bindings.outWaitingQueue = {
+      guid: form.guid,
+      tag: form.tag1
+    };
+
+    return {
       status: 200,
       body: { "filename": "sample.jpg" }
     };
   } catch (err) {
-    context.bindings.res = {
+    return {
       status: 500,
-      body: "ERROR"
+      body: err.message
     };
   }
 };
