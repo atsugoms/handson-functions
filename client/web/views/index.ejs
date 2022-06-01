@@ -12,11 +12,26 @@
 </head>
 <body>
   <div class="container">
-    <form action="http://localhost:7071/api/trainings" method="POST" enctype='multipart/form-data'>
-    <!-- <form action="/" method="POST" enctype='multipart/form-data'> -->
+    <form action="<%= url %>" method="POST" enctype='multipart/form-data'>
+      <div class="form-group">
+        <label for="url">リクエスト</label>
+        <input type="text" class="form-control" id="url" name="url" value="POST <%= url %>" readonly>
+      </div>
+      <div class="form-group">
+        <label for="guid">GUID</label>
+        <input type="text" class="form-control" id="guid" name="guid" value="<%= guid %>" readonly>
+      </div>
       <div class="form-group">
         <label for="file1">ファイル</label>
         <input type="file" class="form-control-file" id="file1" name="file1">
+      </div>
+      <div class="form-group">
+        <label for="tag1">タグ</label>
+        <select class="form-control" id="tag1" name="tag1">
+          <option value=""></option>
+          <option value="Hemlock">Hemlock</option>
+          <option value="Japanese_Cherry">Japanese Cherry</option>
+        </select>
       </div>
       <button type="submit" class="btn btn-primary">送信</button>
     </form>

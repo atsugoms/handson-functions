@@ -1,9 +1,14 @@
+require("dotenv").config();
 const router = require("express").Router();
 const multer = require("multer");
 const upload = multer({ dest: "./tmp" });
+const { v4: uuid } = require("uuid");
 
 router.get("/", (req, res, next) => {
-  res.render("./index.ejs");
+  var url = process.env.REQUEST_URL || "/";
+  var guid = uuid();
+
+  res.render("./index.ejs", { url, guid });
 });
 
 // router.post("/", upload.single("file1"), (req, res, next) => {
@@ -23,7 +28,7 @@ router.post("/", (req, res, next) => {
     next(err);
   });
   bb.on("close", () => {
-    res.render("./index.ejs");
+    res.redirect("/");
   });
   req.pipe(bb);
 });
