@@ -6,26 +6,20 @@
       "direction": "in",
       "name": "req",
       "methods": [
+        "get",
         "post"
       ]
     },
     {
       "type": "http",
       "direction": "out",
-      "name": "res"
-    },
-    {
-      "type": "queue",
-      "direction": "out",
-      "name": "waiting",
-      "queueName": "waiting",
-      "connection": "QUEUE_STORAGE_ACCOUNT"
+      "name": "$return"
     },
     {
       "type": "blob",
       "direction": "out",
-      "name": "outImageBlob",
-      "path": "images/{filename}",
+      "name": "outputBlob",
+      "path": "outcontainer/{rand-guid}",
       "connection": "QUEUE_STORAGE_ACCOUNT"
     }
   ]

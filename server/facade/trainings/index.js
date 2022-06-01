@@ -114,9 +114,10 @@ module.exports = async function (context, req) {
   var form;
   try {
     form = await readOut(context, req);
+    context.bindings.outImageBlob = form["file1"].buffer;
     context.bindings.res = {
       status: 200,
-      body: "OK"
+      body: { "filename": "sample.jpg" }
     };
   } catch (err) {
     context.bindings.res = {
