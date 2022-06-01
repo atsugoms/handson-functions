@@ -20,13 +20,6 @@
       "name": "outWaitingQueue",
       "queueName": "waiting",
       "connection": "QUEUE_STORAGE_ACCOUNT"
-    },
-    {
-      "type": "blob",
-      "direction": "out",
-      "name": "outImageBlob",
-      "path": "images/{guid}",
-      "connection": "QUEUE_STORAGE_ACCOUNT"
     }
   ]
 }

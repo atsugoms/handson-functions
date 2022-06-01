@@ -1,3 +1,63 @@
+const { BlobServiceClient } = require("@azure/storage-blob");
+const readFormData = require("../lib/readFormData");
+const STORAGE_CONNECTION_STRING = process.env.QUEUE_STORAGE_ACCOUNT;
+const STORAGE_CONTAINER_NAME = "images";
+
+/**
+ * Blobへ登録
+ * @param {*} context 
+ * @param {*} form 
+ */
+var registBlob = async function (context, form) {
+  var blobServiceClient, containerClient, blockBlobClient;
+  var blobName = form.guid;
+
+  // Blobへ接続
+  blobServiceClient = BlobServiceClient.fromConnectionString(STORAGE_CONNECTION_STRING);
+  containerClient = blobServiceClient.getContainerClient(STORAGE_CONTAINER_NAME);
+  if (await containerClient.exists() === false) {
+    await containerClient.create();
+  }
+
+  // アップロード
+  blockBlobClient = containerClient.getBlockBlobClient(blobName);
+  await blockBlobClient.uploadData(form["file1"].buffer);
+
+  console.log("upload to " + blockBlobClient.url);
+  return blockBlobClient.url;
+};
+
+/**
+ * Queue へ登録
+ * @param {*} context 
+ * @param {*} form 
+ */
+var registQueue = async function (context, form) {
+  context.bindings.outWaitingQueue = {
+    guid: form.guid,
+    tag: form.tag1
+  };
+};
+
+module.exports = async function (context, req) {
+  var form, blobServiceClient, containerClient, blockBlobClient;
+
+  try {
+    // マルチパートフォームの分解
+    form = await readFormData(context, req);
+
+    // Blob へ登録
+    await registBlob(context, form);
+
+    // Queue へ登録
+    await registQueue(context, form);
+
+    return { status: 200, body: "OK" };
+  } catch (err) {
+    return { status: 500, body: err.message };
+  }
+};
+
 // var readOut = async function (req) {
 //   return new Promise((resolve, reject) => {
 //     var raw = "";
@@ -61,68 +121,68 @@
 // -----------------------------------------------------------------
 // https://www.sergevandenoever.nl/Processing-multipart-form-data-in-nodejs-azure-function-with-httptrigger/
 // -----------------------------------------------------------------
-const busboy = require("busboy");
-const fs = require("fs");
-const path = require("path");
+// const busboy = require("busboy");
+// const fs = require("fs");
+// const path = require("path");
 
-var readFormData = async function (context, req) {
-  return new Promise((resolve, reject) => {
-    var form = {};
-    var bb = busboy({ headers: req.headers });
+// var readFormData = async function (context, req) {
+//   return new Promise((resolve, reject) => {
+//     var form = {};
+//     var bb = busboy({ headers: req.headers });
 
-    bb.on("file", (name, file, info) => {
-      var bytes = [];
-      file.on("data", (chunk) => {
-        bytes.push(chunk);
-      });
-      file.on("end", () => {
-        form[name] = {
-          buffer: Buffer.concat(bytes),
-          ...info
-        };
-      });
-      file.resume();
-    });
-    bb.on("field", (name, value, info) => {
-      form[name] = value;
-    });
-    bb.on("error", (err) => {
-      reject(err);
-    });
-    bb.on("finish", () => {
-      resolve(form);
-    });
+//     bb.on("file", (name, file, info) => {
+//       var bytes = [];
+//       file.on("data", (chunk) => {
+//         bytes.push(chunk);
+//       });
+//       file.on("end", () => {
+//         form[name] = {
+//           buffer: Buffer.concat(bytes),
+//           ...info
+//         };
+//       });
+//       file.resume();
+//     });
+//     bb.on("field", (name, value, info) => {
+//       form[name] = value;
+//     });
+//     bb.on("error", (err) => {
+//       reject(err);
+//     });
+//     bb.on("finish", () => {
+//       resolve(form);
+//     });
 
-    bb.end(req.body);
-  });
-};
+//     bb.end(req.body);
+//   });
+// };
 
-module.exports = async function (context, req) {
-  var form;
-  try {
-    // マルチパートフォームの読み取り
-    form = await readFormData(context, req);
+// module.exports = async function (context, req) {
+//   var form;
+//   try {
+//     // マルチパートフォームの読み取り
+//     form = await readFormData(context, req);
 
-    // Blob へ書き込み
-    context.bindings.outImageBlob = form["file1"].buffer;
+//     // Blob へ書き込み
+//     context.bindings.outImageBlob = form["file1"].buffer;
 
-    // Queue へ書き込み
-    context.bindings.outWaitingQueue = {
-      guid: form.guid,
-      tag: form.tag1
-    };
+//     // Queue へ書き込み
+//     context.bindings.outWaitingQueue = {
+//       guid: form.guid,
+//       tag: form.tag1
+//     };
 
-    return {
-      status: 200,
-      body: { "filename": "sample.jpg" }
-    };
-  } catch (err) {
-    return {
-      status: 500,
-      body: err.message
-    };
-  }
-};
+//     return {
+//       status: 200,
+//       body: { "filename": "sample.jpg" }
+//     };
+//   } catch (err) {
+//     return {
+//       status: 500,
+//       body: err.message
+//     };
+//   }
+// };
 
 
 // -----------------------------------------------------------------
