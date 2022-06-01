@@ -1,0 +1,19 @@
+{
+  "bindings": [
+    {
+      "type": "queueTrigger",
+      "direction": "in",
+      "name": "myQueueItem",
+      "queueName": "waiting",
+      "connection": "QUEUE_STORAGE_ACCOUNT"
+    },
+    {
+      "type": "blob",
+      "direction": "in",
+      "name": "inImageBlob",
+      "path": "images/{guid}",
+      "connection": "QUEUE_STORAGE_ACCOUNT",
+      "dataType": "binary"
+    }
+  ]
+}
