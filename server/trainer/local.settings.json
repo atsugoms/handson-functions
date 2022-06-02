@@ -3,7 +3,6 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "node",
-    "QUEUE_STORAGE_ACCOUNT": "UseDevelopmentStorage=true",
     "CV_PROJECT_ID": "54bf7251-1cc1-44b2-99e0-94d88f99b631",
     "CV_TRAINING_KEY": "6bf3e1d3f80a4a4099394282407d7d4d",
     "CV_TRAINING_ENDPOINT": "https://hl-functions-dev-training-cv.cognitiveservices.azure.com/"
