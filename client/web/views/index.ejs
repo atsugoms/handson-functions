@@ -12,28 +12,41 @@
 </head>
 <body>
   <div class="container">
+    <h1 class="display-5 border-bottom my-3">Handson リクエストツール</h1>
     <form action="<%= url %>" method="POST" enctype='multipart/form-data'>
-      <div class="form-group">
-        <label for="url">リクエスト</label>
-        <input type="text" class="form-control" id="url" name="url" value="POST <%= url %>" readonly>
+      <div class="form-group row">
+        <label for="url" class="col-sm-2 col-form-label">リクエスト</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="url" name="url" value="POST <%= url %>" readonly>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="guid">GUID</label>
-        <input type="text" class="form-control" id="guid" name="guid" value="<%= guid %>" readonly>
+      <div class="form-group row">
+        <label for="guid" class="col-sm-2 col-form-label">GUID</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="guid" name="guid" value="<%= guid %>" readonly>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="file1">ファイル</label>
-        <input type="file" class="form-control-file" id="file1" name="file1">
+      <div class="form-group row">
+        <label for="file1" class="col-sm-2 col-form-label">ファイル</label>
+        <div class="col-sm-10">
+          <input type="file" class="form-control-file" id="file1" name="file1">
+        </div>
       </div>
-      <div class="form-group">
-        <label for="tag1">タグ</label>
-        <select class="form-control" id="tag1" name="tag1">
-          <option value=""></option>
-          <option value="Hemlock">Hemlock</option>
-          <option value="Japanese_Cherry">Japanese Cherry</option>
-        </select>
+      <div class="form-group row">
+        <label for="tag1" class="col-sm-2 col-form-label">タグ</label>
+        <div class="col-sm-10">
+          <select class="form-control" id="tag1" name="tag1">
+            <option value=""></option>
+            <option value="Hemlock">Hemlock</option>
+            <option value="Japanese_Cherry">Japanese Cherry</option>
+          </select>
+        </div>
       </div>
-      <button type="submit" class="btn btn-primary">送信</button>
+      <div class="row">
+        <div class="col-sm-10 offset-sm-2">
+          <button type="submit" class="btn btn-primary">送信</button>
+        </div>
+      </div>
     </form>
   </div>
 </body>
