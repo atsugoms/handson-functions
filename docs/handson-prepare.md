@@ -10,6 +10,15 @@
 
 ## 作業手順
 
+#### 環境準備
+
+1. 以下をインストール
+    * [Visual Studio Code](https://code.visualstudio.com/download)
+      * Azure Functions プラグイン
+      * Azurite プラグイン
+    * [Azure Storage Explorer](https://azure.microsoft.com/ja-jp/features/storage-explorer/)
+
+
 ### リソースグループ作成
 
 1. Azure ポータルを開いてリソースグループ作成
