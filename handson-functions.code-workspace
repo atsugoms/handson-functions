@@ -1,0 +1,29 @@
+{
+	"folders": [
+    {
+      "name": "cli",
+      "path": "client\\cli"
+    },
+    {
+      "name": "web",
+      "path": "client\\web"
+    },
+    {
+      "name": "facade",
+      "path": "server\\facade"
+    },
+    {
+      "name": "regist",
+      "path": "server\\regist"
+    },
+    {
+      "name": "trainer",
+      "path": "server\\trainer"
+    },
+    {
+      "name": "docs",
+      "path": "docs"
+    }
+  ],
+  "settings": {}
+}
