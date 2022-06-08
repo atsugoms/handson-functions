@@ -26,9 +26,9 @@
 * [開発環境準備](./handson-prepare.md)
 
 <!-- 1. [Exercise1：Httpトリガー作成（ローカル）](#exercise1ネットワーク作成) -->
-1. Exercise1：Httpトリガー作成（ローカル開発）
-1. Exercise2：Httpトリガー作成（Azureデプロイ）
-1. Exercise3：Httpトリガー作成（Blob連携）
+1. [Exercise1：Httpトリガー作成（ローカル開発）](#exercise1httpトリガー作成ローカル開発)
+1. [Exercise2：Httpトリガー作成（Azureデプロイ）](#exercise2httpトリガー作成azureデプロイ)
+1. [Exercise3：Httpトリガー作成（Blob連携）](#exercise3httpトリガー作成blob連携)
 1. [Exercise4：Queueトリガー作成](#exercise4queueトリガー作成)
 1. Exercise5：タイマートリガー作成
 
