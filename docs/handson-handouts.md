@@ -491,3 +491,120 @@ Queueトリガー関数アプリのデプロイ
 1. 登録した画像とタグが設定されていればOK
 
 
+### Exercise5：タイマートリガー作成
+
+タイマートリガー関数アプリの作成
+
+1. Azureポータルを開く
+1. 「関数アプリ」を開く
+1. 「作成」からリソースを作成
+    1. 基本
+        |項目|設定内容|
+        |---|---|
+        |リソースグループ|（最初に作成したもの）|
+        |関数アプリ名|（任意。以降は `trainer-func` で表記）|
+        |公開| `コード` |
+        |ランタイムスタック| `Node.js` |
+        |バージョン| `14 LTS` |
+        |地域(リージョン)|（リソースグループに合わせる）|
+        |OS| `Linux` |
+        |プランの種類| `Premium` |
+        |Linuxプラン|（最初の関数アプリ作成時に作成した App Service プラン）|
+
+    1. ホスティング
+
+        |項目|設定内容|
+        |---|---|
+        |ストレージアカウント|（最初の関数アプリ作成時に作成したもの）|
+
+    1. ネットワーク
+
+        （特に設定なし。デフォルトのママ）
+
+    1. 監視
+        |項目|設定内容|
+        |---|---|
+        |Application Insights を有効にする| `はい` |
+        |Application Insights|（最初の関数アプリ作成時に作成したもの）
+
+    1. タグ
+
+        （特に設定なし。デフォルトのママ）
+
+    1. 確認および作成
+
+        内容を確認して「作成」を選択
+
+接続文字列設定
+
+1. Azureポータルを開く
+1. 「関数アプリ」を開く
+1. 作成済みの タイマートリガー関数アプリ（ `trainer-func` ）を開く
+1. [設定]-[構成]を開く
+1. 「アプリケーション設定」を追加
+    1. 「新しいアプリケーション設定」を選択、入力、「OK」
+
+        |名前             |値|
+        |-----------------------|---|
+        |`CV_PROJECT_ID`          |（Custom Vision のプロジェクトID）|
+        |`CV_TRAINING_KEY`        |（Custom Vision のトレーニングキー）|
+        |`CV_TRAINING_ENDPOINT`   |（Custom Vision のトレーニングエンドポイント）|
+
+    1. すべて追加し終えたら「保存」を選択
+    1. 「変更の保存」で「続行」を選択
+
+
+タイマートリガー関数アプリのデプロイ
+
+1. ダウンロード済み `/server/trainer` フォルダを Visual Studio Code で開く
+1. アクティビティバーにある「Azure」を開く
+1. 「WORKSPACE」の横にある「Deploy」を展開
+1. 「Deploy to Function App...」を選択
+    1. `Select a resource` は作成済みのQueueトリガー関数アプリ（ `trainer-func` ）を選択
+    1. 上書きしてよいか確認の警告が出るので「Deploy」を選択
+
+
+動作確認
+
+1. Custom Vision のプロジェクトへ学習画像を登録
+    1. Custom Vision のプロジェクト一覧を開く
+
+        https://www.customvision.ai/projects
+
+    1. 作成したプロジェクトを開く
+    1. 「Add images」を選択して学習させる画像を登録
+
+        |画像|タグ|
+        |---|---|
+        |`/ImageClassification/Hemlock` 以下にある画像| `Hemlock` |
+        |`/ImageClassification/Japanese_Cherry` 以下にある画像| `Japanese_Cherry` |
+
+1. タイマートリガー関数アプリを手動実行
+    1. Visual Studio Code を開く
+    1. [ファイル]-[新しいファイル]を開く
+    1. 右下の言語モード（ステータスバー上の `プレーンテキスト` ）を選択して「HTTP」に変更
+    1. 以下のリクエストを作成して「Send Request」を選択
+
+        ```
+        POST https://{タイマー関数アプリのホスト名}/admin/functions/TimerTrigger1
+        x-functions-key: {タイマー関数アプリのマスターキー}
+        Content-Type: application/json
+
+        {}
+        ```
+
+        `202 Accepted` の応答があれば実行できた状態。
+        関数アプリの [監視]-[ログストリーム] を開いておいても実行されたかどうか確認できる。
+
+1. Custom Vision でトレーニングが開始されたことを確認
+    1. Custom Vision のプロジェクト一覧を開く
+
+        https://www.customvision.ai/projects
+
+    1. 作成したプロジェクトを開く
+    1. 「Performance」タブへ移動
+        * `Iteration` が作成されていればOK
+
+
+
+
