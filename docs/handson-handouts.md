@@ -29,7 +29,7 @@
 1. Exercise1：Httpトリガー作成（ローカル開発）
 1. Exercise2：Httpトリガー作成（Azureデプロイ）
 1. Exercise3：Httpトリガー作成（Blob連携）
-1. Exercise4：Queueトリガー作成
+1. [Exercise4：Queueトリガー作成](#exercise4queueトリガー作成)
 1. Exercise5：タイマートリガー作成
 
 
@@ -343,4 +343,151 @@ HTTPトリガーの上書きデプロイ
           "tag": "Hemlock"
         }
         ```
+
+
+### Exercise4：Queueトリガー作成
+
+Custom Vision 作成（リソース作成）
+
+1. Azureポータルを開く
+1. 「Cognitive Service」を開く
+1. [Vision]-[Cusom Vision]を開く
+1. 「作成」からリソースを作成
+    1. 基本
+        |項目|設定内容|
+        |---|---|
+        |作成オプション|両方|
+        |サブスクリプション|（作成済みのもの）|
+        |地域(リージョン)|（リソースグループに合わせる）|
+        |名前|（任意）|
+        |トレーニング価格レベル| `Free F0` (選択できれば) |
+        |予測価格レベル| `Free F0` (選択できれば) |
+
+    1. ネットワーク、タグ
+
+        （特に設定なし。デフォルトのママ）
+
+    1. 確認および作成
+
+        内容を確認して「作成」を選択
+1. 作成されたリソースのうち「トレーニング」のリソースを開く
+1. [リソース管理]-[キーとエンドポイント]を開く
+1. 以下の値をメモしておく
+    * `キー1`
+    * `エンドポイント`
+
+Custom Vision 作成（プロジェクト作成）
+
+1. 以下のアドレス（Custom Vision のプロジェクトページ）へアクセス
+
+    https://www.customvision.ai/projects
+
+1. 「NEW PROJECT」を選択してプロジェクトを作成
+    1. 以下の設定をして「Create project」を選択
+
+        |項目|値|
+        |---|---|
+        |Name|（任意）|
+        |Resource|（前手順で作成したリソース）|
+        |Project Type| `Classfication` |
+        |Classification Types| `Multiclass (Single tag per image)` |
+        |Domains| `General [A2]` |
+
+1. 画面右上にある「歯車」を選択
+1. 以下の値をメモしておく
+    * `Project Id`
+
+Queueトリガー関数アプリの作成
+
+1. Azureポータルを開く
+1. 「関数アプリ」を開く
+1. 「作成」からリソースを作成
+    1. 基本
+        |項目|設定内容|
+        |---|---|
+        |リソースグループ|（最初に作成したもの）|
+        |関数アプリ名|（任意。以降は `regist-func` で表記）|
+        |公開| `コード` |
+        |ランタイムスタック| `Node.js` |
+        |バージョン| `14 LTS` |
+        |地域(リージョン)|（リソースグループに合わせる）|
+        |OS| `Linux` |
+        |プランの種類| `Premium` |
+        |Linuxプラン|（最初の関数アプリ作成時に作成した App Service プラン）|
+
+    1. ホスティング
+
+        |項目|設定内容|
+        |---|---|
+        |ストレージアカウント|（最初の関数アプリ作成時に作成したもの）|
+
+    1. ネットワーク
+
+        （特に設定なし。デフォルトのママ）
+
+    1. 監視
+        |項目|設定内容|
+        |---|---|
+        |Application Insights を有効にする| `はい` |
+        |Application Insights|（最初の関数アプリ作成時に作成したもの）
+
+    1. タグ
+
+        （特に設定なし。デフォルトのママ）
+
+    1. 確認および作成
+
+        内容を確認して「作成」を選択
+
+接続文字列設定
+
+1. Azureポータルを開く
+1. 「関数アプリ」を開く
+1. 作成済みのQueueトリガー関数アプリ（ `regist-func` ）を開く
+1. [設定]-[構成]を開く
+1. 「アプリケーション設定」を追加
+    1. 「新しいアプリケーション設定」を選択、入力、「OK」
+
+        |名前             |値|
+        |-----------------------|---|
+        |`QUEUE_STORAGE_ACCOUNT`  |（共有キューストレージへの接続文字列）|
+        |`CV_PROJECT_ID`          |（Custom Vision のプロジェクトID）|
+        |`CV_TRAINING_KEY`        |（Custom Vision のトレーニングキー）|
+        |`CV_TRAINING_ENDPOINT`   |（Custom Vision のトレーニングエンドポイント）|
+
+    1. すべて追加し終えたら「保存」を選択
+    1. 「変更の保存」で「続行」を選択
+
+
+Queueトリガー関数アプリのデプロイ
+
+1. ダウンロード済み `/server/regist` フォルダを Visual Studio Code で開く
+1. アクティビティバーにある「Azure」を開く
+1. 「WORKSPACE」の横にある「Deploy」を展開
+1. 「Deploy to Function App...」を選択
+    1. `Select a resource` は作成済みのQueueトリガー関数アプリ（ `regist-func` ）を選択
+    1. 上書きしてよいか確認の警告が出るので「Deploy」を選択
+
+
+動作確認
+
+1. Azure ポータルを開く
+1. 「App Service」を開く
+1. 作成したクライアント App Service を開く
+1. 「概要」にある「URL」をコピーしてブラウザで開く
+1. 関数アプリにデータを送信
+    |項目|値|
+    |---|---|
+    |ファイル| `/docs/ImageClassfication/` 以下にあるファイル |
+    |タグ| フォルダ名と同じものを指定 |
+
+<!--  -->
+
+1. Custom Vision のプロジェクト一覧ページを開く
+
+    https://www.customvision.ai/projects
+
+1. 作成済みのプロジェクトを開く
+1. 登録した画像とタグが設定されていればOK
+
 
