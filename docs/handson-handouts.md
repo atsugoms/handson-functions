@@ -438,6 +438,11 @@ HTTPトリガーの上書きデプロイ
 
 ## Exercise4：Queueトリガー作成
 
+登録されたキューを取り出して CustomVision へ流し込む関数アプリを作成します。
+
+![](./images/e04-0000-agenda.png)
+
+
 Custom Vision 作成（リソース作成）
 
 1. Azureポータルを開く
@@ -454,6 +459,8 @@ Custom Vision 作成（リソース作成）
         |トレーニング価格レベル| `Free F0` (選択できれば) |
         |予測価格レベル| `Free F0` (選択できれば) |
 
+        ![](./images/e04-0101-create-cv.png)
+
     1. ネットワーク、タグ
 
         （特に設定なし。デフォルトのママ）
@@ -461,11 +468,16 @@ Custom Vision 作成（リソース作成）
     1. 確認および作成
 
         内容を確認して「作成」を選択
-1. 作成されたリソースのうち「トレーニング」のリソースを開く
+
+1. 作成されたリソースのうち「トレーニング」のリソース（概要ページの「APIの種類」が `Custom Vision Training` になっているリソース）を開く
 1. [リソース管理]-[キーとエンドポイント]を開く
-1. 以下の値をメモしておく
+1. 「キーの表示」を行い、以下の値をメモしておく
     * `キー1`
     * `エンドポイント`
+
+    ![](./images/e04-0102-get-tcv-constr.png)
+
+
 
 Custom Vision 作成（プロジェクト作成）
 
@@ -479,14 +491,20 @@ Custom Vision 作成（プロジェクト作成）
         |項目|値|
         |---|---|
         |Name|（任意）|
-        |Resource|（前手順で作成したリソース）|
+        |Resource|（前手順で作成したリソース。表示されないときは少し待つ。）|
         |Project Type| `Classfication` |
         |Classification Types| `Multiclass (Single tag per image)` |
         |Domains| `General [A2]` |
 
+        ![](./images/e04-0103-create-cv-project.png)
+
 1. 画面右上にある「歯車」を選択
 1. 以下の値をメモしておく
     * `Project Id`
+
+    ![](./images/e04-0104-get-cv-constr.png)
+
+
 
 Queueトリガー関数アプリの作成
 
@@ -504,7 +522,7 @@ Queueトリガー関数アプリの作成
         |地域(リージョン)|（リソースグループに合わせる）|
         |OS| `Linux` |
         |プランの種類| `Premium` |
-        |Linuxプラン|（最初の関数アプリ作成時に作成した App Service プラン）|
+        |Linuxプラン| **（最初の関数アプリ作成時に作成した App Service プラン）** |
 
     1. ホスティング
 
@@ -542,9 +560,9 @@ Queueトリガー関数アプリの作成
         |名前             |値|
         |-----------------------|---|
         |`QUEUE_STORAGE_ACCOUNT`  |（共有キューストレージへの接続文字列）|
-        |`CV_PROJECT_ID`          |（Custom Vision のプロジェクトID）|
-        |`CV_TRAINING_KEY`        |（Custom Vision のトレーニングキー）|
-        |`CV_TRAINING_ENDPOINT`   |（Custom Vision のトレーニングエンドポイント）|
+        |`CV_PROJECT_ID`          |（Custom Vision のプロジェクトID（Custom Vision のプロジェクトから取得））|
+        |`CV_TRAINING_KEY`        |（Custom Vision のトレーニングキー（Azureポータルのリソースから取得））|
+        |`CV_TRAINING_ENDPOINT`   |（Custom Vision のトレーニングエンドポイント（Azureポータルのリソースから取得））|
 
     1. すべて追加し終えたら「保存」を選択
     1. 「変更の保存」で「続行」を選択
@@ -562,25 +580,28 @@ Queueトリガー関数アプリのデプロイ
 
 動作確認
 
-1. Azure ポータルを開く
-1. 「App Service」を開く
-1. 作成したクライアント App Service を開く
-1. 「概要」にある「URL」をコピーしてブラウザで開く
-1. 関数アプリにデータを送信
-    |項目|値|
-    |---|---|
-    |ファイル| `/docs/ImageClassfication/` 以下にあるファイル |
-    |タグ| フォルダ名と同じものを指定 |
+1. テストデータの送信
+    1. Azure ポータルを開く
+    1. 「App Service」を開く
+    1. 作成したクライアント App Service を開く
+    1. 「概要」にある「URL」をコピーしてブラウザで開く
+    1. 関数アプリにデータを送信
+        |項目|値|
+        |---|---|
+        |ファイル| `/docs/ImageClassfication/Japanese_Cherry` 以下にある任意の画像ファイル |
+        |タグ| `Japanese_Cherry` |
 
-<!--  -->
+        ![](./images/e04-0501-test-request.png)
 
-1. Custom Vision のプロジェクト一覧ページを開く
+1. テストデータが受信できたことの確認
+    1. Custom Vision のプロジェクト一覧ページを開く
 
-    https://www.customvision.ai/projects
+        https://www.customvision.ai/projects
 
-1. 作成済みのプロジェクトを開く
-1. 登録した画像とタグが設定されていればOK
+    1. 作成済みのプロジェクトを開く
+    1. 登録した画像とタグが設定されていればOK
 
+        ![](./images/e04-0502-valid-request.png)
 
 ## Exercise5：タイマートリガー作成
 
