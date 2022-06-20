@@ -29,9 +29,13 @@
 1. 任意のフォルダを作成（プロジェクト用フォルダ作成）
 1. 作成したフォルダを Visual Studio Code で開く
 1. アクティビティバーにある「Azure」を開く
+
     ![](./images/e01-0100-azure.png)
+
 1. 「WORKSPACE」にある「＋」を開き「Create Function...」を選択
+
     ![](./images/e01-0101-create-functions.png)
+
     1. `Select a language` は `JavaScript` を選択
     1. `Select a template for your project's first function` は `HTTP trigger` を選択
     1. `Provide a function name` は任意（デフォルトの `HttpTrigger1` でもOK）
@@ -43,6 +47,7 @@ Azurite の起動
 1. 「WORKSPACE」にある「Attached Storage Accounts」を展開
 1. 「Local Emulator」→「Blob Containers」および「Queues」をそれぞれ展開
 1. `Start Blob Emulator` および `Start Queue Emulator` を選択
+
     ![](./images/e01-0200-start-emulator.png)
 
 ストレージへの接続文字列を追加
@@ -69,7 +74,9 @@ Azurite の起動
 
 1. 作成した関数フォルダにある `function.json` を右クリック
 1. `Add binding...` を選択
+
     ![](./images/e01-0301-add-binding.png)
+
     1. `Select binding direction` は `out` を選択
     1. `Select binding with direction "out"` は `Azure Queue Storage` を選択
     1. `バインド名` は任意（後の実装ではデフォルトの `outputQueueItem` を利用）
@@ -134,10 +141,13 @@ Httpトリガーの実行/テスト
 
 1. 動作確認
     1. ブラウザにメッセージが表示されればリクエストはOK
+
         ![](./images/e01-0401-test-function.png)
+
     1. Azure Storage Explorer を開く
         1. 「ローカルで接続済み」-「(エミュレーター-既定のポート)」-「Queues」-「outqueue（設定した名称）」を開く
         1. ブラウザに出ているメッセージと同じメッセージが登録されていればOK
+        
             ![](./images/e01-0402-test-function.png)
 
 
