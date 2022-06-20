@@ -603,7 +603,15 @@ Queueトリガー関数アプリのデプロイ
 
         ![](./images/e04-0502-valid-request.png)
 
+
+
 ## Exercise5：タイマートリガー作成
+
+タイマートリガーを作成して自動的にデータ更新されるようにする。
+
+![](./images/e05-0000-agenda.png)
+
+
 
 タイマートリガー関数アプリの作成
 
@@ -686,6 +694,8 @@ Queueトリガー関数アプリのデプロイ
     1. 作成したプロジェクトを開く
     1. 「Add images」を選択して学習させる画像を登録
 
+        これまでの演習で登録された画像はいったん削除して、再度トレーニング画像をすべて登録する。
+
         |画像|タグ|
         |---|---|
         |`/ImageClassification/Hemlock` 以下にある画像| `Hemlock` |
@@ -698,7 +708,7 @@ Queueトリガー関数アプリのデプロイ
     1. 以下のリクエストを作成して「Send Request」を選択
 
         ```
-        POST https://{タイマー関数アプリのホスト名}/admin/functions/TimerTrigger1
+        POST https://{タイマー関数アプリ名}.azurewebsites.net/admin/functions/TimerTrigger1
         x-functions-key: {タイマー関数アプリのマスターキー}
         Content-Type: application/json
 
@@ -706,6 +716,9 @@ Queueトリガー関数アプリのデプロイ
         ```
 
         `202 Accepted` の応答があれば実行できた状態。
+
+        ![](./images/e05-0401-send-request.png)
+
         関数アプリの [監視]-[ログストリーム] を開いておいても実行されたかどうか確認できる。
 
 1. Custom Vision でトレーニングが開始されたことを確認
@@ -715,8 +728,10 @@ Queueトリガー関数アプリのデプロイ
 
     1. 作成したプロジェクトを開く
     1. 「Performance」タブへ移動
-        * `Iteration` が作成されていればOK
+        * `Iteration` が作成されていればOK。
 
+            実行完了までには数分かかる。
 
+        ![](./images/e05-0402-trained.png)
 
 
