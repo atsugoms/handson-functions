@@ -4,7 +4,6 @@
 
 * [開発環境準備](./handson-prepare.md)
 
-<!-- 1. [Exercise1：Httpトリガー作成（ローカル）](#exercise1ネットワーク作成) -->
 1. [Exercise1：Httpトリガー作成（ローカル開発）](#exercise1httpトリガー作成ローカル開発)
 1. [Exercise2：Httpトリガー作成（Azureデプロイ）](#exercise2httpトリガー作成azureデプロイ)
 1. [Exercise3：Httpトリガー作成（Blob連携）](#exercise3httpトリガー作成blob連携)
@@ -14,19 +13,25 @@
 
 ---
 
-## 事前準備
-
-[事前準備](handson-prepare.md) が終わっているか確認。
-終わっていない場合、事前準備を先に実施する。
-
 ## Exercise1：Httpトリガー作成（ローカル開発）
+
+本 Exercise ではローカル環境でHttpトリガー関数アプリを作成、実行、テストを行います。
+
+![](./images/e01-0000-agenda.png)
+
+環境準備
+
+1. [事前準備](handson-prepare.md) が終わっているか確認。
+    終わっていない場合、事前準備を先に実施する。
 
 プロジェクトのひな形作成
 
 1. 任意のフォルダを作成（プロジェクト用フォルダ作成）
 1. 作成したフォルダを Visual Studio Code で開く
 1. アクティビティバーにある「Azure」を開く
+    ![](./images/e01-0100-azure.png)
 1. 「WORKSPACE」にある「＋」を開き「Create Function...」を選択
+    ![](./images/e01-0101-create-functions.png)
     1. `Select a language` は `JavaScript` を選択
     1. `Select a template for your project's first function` は `HTTP trigger` を選択
     1. `Provide a function name` は任意（デフォルトの `HttpTrigger1` でもOK）
@@ -38,6 +43,7 @@ Azurite の起動
 1. 「WORKSPACE」にある「Attached Storage Accounts」を展開
 1. 「Local Emulator」→「Blob Containers」および「Queues」をそれぞれ展開
 1. `Start Blob Emulator` および `Start Queue Emulator` を選択
+    ![](./images/e01-0200-start-emulator.png)
 
 ストレージへの接続文字列を追加
 
@@ -47,21 +53,52 @@ Azurite の起動
     |--|--|
     | `SHARED_STORAGE_ACCOUNT` | `UseDevelopmentStorage=true` |
 
+    `/local.settings.json`
+    ```javascript
+    {
+      "IsEncrypted": false,
+      "Values": {
+        "AzureWebJobsStorage": "",
+        "FUNCTIONS_WORKER_RUNTIME": "node",
+        "SHARED_STORAGE_ACCOUNT": "UseDevelopmentStorage=true"
+      }
+    }
+    ```
+
 バインド設定の追加
 
 1. 作成した関数フォルダにある `function.json` を右クリック
 1. `Add binding...` を選択
-  1. `Select binding direction` は `out` を選択
-  1. `Select binding with direction "out"` は `Azure Queue Storage` を選択
-  1. `バインド名` は任意（後の実装ではデフォルトの `outputQueueItem` を利用）
-  1. `送信先キュー名` も任意
-  1. `Select setting from "local.settings.json"` は `SHARED_STORAGE_ACCOUNT` を選択
+    ![](./images/e01-0301-add-binding.png)
+    1. `Select binding direction` は `out` を選択
+    1. `Select binding with direction "out"` は `Azure Queue Storage` を選択
+    1. `バインド名` は任意（後の実装ではデフォルトの `outputQueueItem` を利用）
+    1. `送信先キュー名` も任意
+    1. `Select setting from "local.settings.json"` は `SHARED_STORAGE_ACCOUNT` を選択
+
+        `/{関数名}/function.json`
+        ```javascript
+        {
+          "bindings": [
+            ...(省略)...
+            {
+              "type": "queue",
+              "direction": "out",
+              "name": "outputQueueItem",
+              "queueName": "outqueue",
+              "connection": "SHARED_STORAGE_ACCOUNT"
+            }
+          ]
+        }
+        ```
 
 Httpトリガーの実装
 
-1. `index.js` を開く
+1. `/{関数名}/index.js` を開く
 1. 以下のように実装を修正
-    ```jabascript
+
+    `/{関数名}/index.js`
+    ```javascript
     module.exports = async function (context, req) {
         context.log('JavaScript HTTP trigger function processed a request.');
 
@@ -97,9 +134,11 @@ Httpトリガーの実行/テスト
 
 1. 動作確認
     1. ブラウザにメッセージが表示されればリクエストはOK
+        ![](./images/e01-0401-test-function.png)
     1. Azure Storage Explorer を開く
         1. 「ローカルで接続済み」-「(エミュレーター-既定のポート)」-「Queues」-「outqueue（設定した名称）」を開く
         1. ブラウザに出ているメッセージと同じメッセージが登録されていればOK
+            ![](./images/e01-0402-test-function.png)
 
 
 ## Exercise2：Httpトリガー作成（Azureデプロイ）
