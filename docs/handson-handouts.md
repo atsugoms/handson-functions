@@ -56,7 +56,7 @@ Azurite の起動
 1. `Values` に接続文字列用のキー `` を追加
     |キー|値|
     |--|--|
-    | `SHARED_STORAGE_ACCOUNT` | `UseDevelopmentStorage=true` |
+    | `QUEUE_STORAGE_ACCOUNT` | `UseDevelopmentStorage=true` |
 
     `/local.settings.json`
     ```javascript
@@ -65,7 +65,7 @@ Azurite の起動
       "Values": {
         "AzureWebJobsStorage": "",
         "FUNCTIONS_WORKER_RUNTIME": "node",
-        "SHARED_STORAGE_ACCOUNT": "UseDevelopmentStorage=true"
+        "QUEUE_STORAGE_ACCOUNT": "UseDevelopmentStorage=true"
       }
     }
     ```
@@ -81,7 +81,7 @@ Azurite の起動
     1. `Select binding with direction "out"` は `Azure Queue Storage` を選択
     1. `バインド名` は任意（後の実装ではデフォルトの `outputQueueItem` を利用）
     1. `送信先キュー名` も任意
-    1. `Select setting from "local.settings.json"` は `SHARED_STORAGE_ACCOUNT` を選択
+    1. `Select setting from "local.settings.json"` は `QUEUE_STORAGE_ACCOUNT` を選択
 
         `/{関数名}/function.json`
         ```javascript
@@ -93,7 +93,7 @@ Azurite の起動
               "direction": "out",
               "name": "outputQueueItem",
               "queueName": "outqueue",
-              "connection": "SHARED_STORAGE_ACCOUNT"
+              "connection": "QUEUE_STORAGE_ACCOUNT"
             }
           ]
         }
@@ -147,17 +147,26 @@ Httpトリガーの実行/テスト
     1. Azure Storage Explorer を開く
         1. 「ローカルで接続済み」-「(エミュレーター-既定のポート)」-「Queues」-「outqueue（設定した名称）」を開く
         1. ブラウザに出ているメッセージと同じメッセージが登録されていればOK
-        
+
             ![](./images/e01-0402-test-function.png)
 
 
 ## Exercise2：Httpトリガー作成（Azureデプロイ）
+
+ローカルで作成した関数アプリをAzure上に展開し、動作確認を行います。
+
+![](./images/e02-0000-agenda.png)
 
 リソースグループ作成
 
 1. Azure ポータルを開く
 1. 「リソースグループ」を開く
 1. 「作成」を選択してリソースグループを作成
+
+    |項目|値|
+    |---|---|
+    |リソースグループ名|（任意）|
+    |リージョン| `Japan East` |
 
 
 ストレージアカウント作成
@@ -172,6 +181,8 @@ Httpトリガーの実行/テスト
         |ストレージアカウント名|（任意）|
         |地域(リージョン)|（リソースグループに合わせる）|
         |パフォーマンス| `Standard` |
+
+        ![](./images/e02-0201-create-storage.png)
 
     1. 詳細設定、ネットワーク、データ保護、暗号化、タグ
 
@@ -199,6 +210,8 @@ HTTPトリガーの作成（Azure上）
         |OS| `Linux` |
         |プランの種類| `Premium` |
 
+        ![](./images/e02-0301-create-functions.png)
+
     1. ホスティング、ネットワーク
 
         （特に設定なし。デフォルトのママ）
@@ -217,32 +230,36 @@ HTTPトリガーの作成（Azure上）
         内容を確認して「作成」を選択
 
 
+関数アプリの接続情報設定（Azure上）
+
+1. Azure ポータルを開く
+1. 「関数アプリ」を開く
+1. 作成済みの関数アプリ（ `facade-func` ）を選択して開く
+1. [設定]-[構成]を開く
+    1. 「アプリケーション設定」の「新しいアプリケーション設定」を選択
+
+        ![](./images/e02-0401-set-constr.png)
+
+    1. 以下の通り値を設定
+        |名前|値|
+        |---|---|
+        | `QUEUE_STORAGE_ACCOUNT` |作成済みキュー保管用ストレージアカウントの「接続文字列」を設定 <br/> (*) 作成したストレージを開く→[セキュリティとネットワーク]-[アクセスキー]→「キーの表示」 <br/> <img src="./images/e02-0402-get-constr.png" width="50%">|
+    1. 「OK」で保存
+    1. [構成]画面上部にある「保存」を押下
+    2. 「続行」
+
+
 HTTPトリガーの作成（Visual Studio Code からデプロイ）
 
 1. Exercise1 で作成したプロジェクトを VSCode で開く
 1. アクティビティバーにある「Azure」を開く
 1. 「WORKSPACE」の横にある「Deploy」を展開
 1. 「Deploy to Function App...」を選択
+
+    ![](./images/e02-0501-deploy-functions.png)
+
     1. `Select a resource` は作成済みの関数アプリを選択
     1. 上書きしてよいか確認の警告が出るので「Deploy」を選択
-<!--  -->
-1. Azure ポータルを開く
-1. 「関数アプリ」を開く
-1. 作成済みの関数アプリ（ `facade-func` ）を選択して開く
-1. [関数]-[関数]を開く
-    1. デプロイした関数名を選択（デフォルトままの場合 `HttpTrigger1` ）
-    1. [Developer]-[統合]を開く
-    1. 「出力」にある「Azure Queue Storage」を選択
-    1. 「Storage account connection」にある「New」を選択
-    1. 作成済みのキュー保管用ストレージアカウントを選択
-    1. 「保存」を選択
-<!-- 1. [設定]-[構成]を開く
-    1. 「アプリケーション設定」の「新しいアプリケーション設定」を選択
-    1. 以下の通り値を設定
-        |名前|値|
-        |---|---|
-        | `SHARED_STORAGE_ACCOUNT` |作成済みキュー保管用ストレージアカウントの「接続文字列」を設定|
-    1. 「OK」で保存 -->
 
 
 HTTPトリガーの実行/テスト
@@ -250,14 +267,26 @@ HTTPトリガーの実行/テスト
 1. Azure ポータルを開く
 1. 「関数アプリ」を開く
 1. 作成済みの関数アプリ（ `facade-func` ）を選択して開く
+
+    ![](./images/e02-0601-get-functions-url.png)
+
 1. 「概要」に表示されている「関数のURLの取得」を選択、表示されるURLをコピー
+
+    ![](./images/e02-0602-get-functions-url.png)
+
 1. 新しくブラウザを立ち上げてコピーしたURLを開く
     1. メッセージが表示されればOK
+
+        ![](./images/e02-0603-test-functions.png)
+
 1. 「ストレージアカウント」を開く
 1. 作成済みのキュー保管用ストレージアカウントを開く
 1. [データストレージ]-[キュー]を開く
     1. 出力先にしていしたキュー名 (デフォルトの場合 `outqueue` ） を開く
     1. キューの内容に先ほどブラウザで表示したメッセージと同じものがあればOK
+
+        ![](./images/e02-0604-test-functions.png)
+
 
 
 ## Exercise3：Httpトリガー作成（Blob連携）
